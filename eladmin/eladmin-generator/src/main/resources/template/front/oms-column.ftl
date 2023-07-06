@@ -1,3 +1,12 @@
+
+<#assign className =  "${className}">
+<#assign author =  "${author}">
+
+<#if author!='' >
+    <#assign className =  author>
+</#if>
+
+
 import User from '@/components/Common/User';
 import { column } from '@/components/ListView';
 import { FormOperation } from '@/components/Web';
@@ -11,10 +20,9 @@ import { getEnumName } from '@/utils';
 import { Inject } from '@/utils/mobx-provider';
 import _ from 'lodash';
 import { toJS } from 'mobx';
+import {  ${className}Store } from '../../stores/${moduleName}/${moduleName}-store';
 
-<#assign str =  "${className}">
-<#assign firstChar = str[0]?lower_case>
-<#assign convertedStr = firstChar + str[1..]>
+
 
 export enum ${className}OperationType {
   新增 = 'create',
@@ -31,7 +39,7 @@ export enum ${className}OperationType {
   </#if>
 
  <#if stateType!='' && stateType!='bool'>
- export enum ${className}State {
+ export enum ${author}State {
    生效 = 10,
    失效 = 20
  }
@@ -115,6 +123,7 @@ export class ${className}Column{
             valueDictionary: '${column.dictName}',
             </#if>
             <#if column.changeColumnName='createBy'>render: (text, record: ${className}Column) => <User code={record.createBy} />,</#if>
+            <#if column.changeColumnName=uniColName>render: (text, record: ${className}Column) => <Link to={'/${package}/${moduleName}/'+${className}OperationType.查看+"/"+ record.${uniColName}}>{record.${uniColName}}</Link>,</#if>
         })
         ${column.changeColumnName}:${result}
 
@@ -156,16 +165,15 @@ export class ${className}Column{
                  {
                    title: '编辑',
                    type: 'link',
-                   // link: '/${convertedStr}/${convertedStr}/'+${className}OperationType.编辑+"/"+ record.${convertedStr}Code,
-                   onClick: async () => {
-                     await store.getDetail(record.${convertedStr}Code);
-                     store.modalShow(${className}OperationType.编辑),
-                   },
+                  link: '/${package}/${moduleName}/'+${className}OperationType.编辑+"/"+ record.${uniColName},
+                    // onClick: async () => {
+                     //  await store.getDetail(record.${uniColName});
+                    // },
                  },
                  {
                    title: '详情',
                    type: 'link',
-                   link: '/${convertedStr}/${convertedStr}/'+${className}OperationType.查看+"/"+ record.${convertedStr}Code,
+                   link: '/${package}/${moduleName}/'+${className}OperationType.查看+"/"+ record.${uniColName},
                  },
                  <#if stateType!='' && stateType!='bool'>
                  {
@@ -173,7 +181,7 @@ export class ${className}Column{
                    type: 'link',
                    confirm: true,
                    onClick: async () => {
-                    // await store.enabled(record.${convertedStr}Code, record.state);
+                    // await store.enabled(record.${uniColName}, record.state);
                      message.success('操作成功');
                      action.reload();
                    },

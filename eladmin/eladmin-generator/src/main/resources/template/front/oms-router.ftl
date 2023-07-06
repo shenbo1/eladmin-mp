@@ -1,20 +1,19 @@
 -- route.config.ts
 import type { IRoute } from '@/types/route';
-<#assign str =  "${className}">
-<#assign firstChar = str[0]?lower_case>
-<#assign convertedStr = firstChar + str[1..]>
+
+
 
 const routes: IRoute[] = [
   {
-    path: '/${convertedStr}',
+    path: '/${package}',
     routes: [
       {
-        path: '/${convertedStr}/list',
-        component: '@/modules/${convertedStr}/pages/${convertedStr}/list.tsx',
+        path: '/${moduleName}/list',
+        component: '@/modules/${package}/pages/${moduleName}/list.tsx',
       },
       {
-        path: '/${convertedStr}/:type/:code?',
-        component: '@/modules/${convertedStr}/pages/${convertedStr}/detail.tsx',
+        path: '/${moduleName}/:type/:code?',
+        component: '@/modules/${package}/pages/${moduleName}/detail.tsx',
       }
     ],
   },

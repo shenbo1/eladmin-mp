@@ -1,7 +1,8 @@
- -- detail.tsx
- <#assign str =  "${className}">
- <#assign firstChar = str[0]?lower_case>
- <#assign convertedStr = firstChar + str[1..]>
+<#if author!='' >
+    <#assign className =  author>
+</#if>
+<#assign changeClassName =  className?uncap_first>
+
 
 import Attachment from '@/components/Common/Attachment';
 import StoreSelectOption from '@/components/Common/StoreSelectOption';
@@ -12,6 +13,7 @@ import { ExclamationCircleFilled } from '@ant-design/icons';
 import ProForm, {
   ProFormDateTimePicker,
   ProFormDateTimeRangePicker,
+  ProFormDatePicker,
   ProFormDigit,
   ProFormRadio,
   ProFormSelect,
@@ -26,10 +28,20 @@ import moment from 'moment';
 import React from 'react';
 import { useHistory, useParams } from 'react-router';
 import { useAsync } from 'react-use';
-import { ${className}Store } from '../../stores/${convertedStr}/${convertedStr}.store';
+import {  ${className}Store } from '../../stores/${moduleName}/${moduleName}-store';
 
 import { ${className}Column,${className}OperationType } from './list-column';
 
+
+ <#assign filterColumns = []>
+
+     <#if columns??>
+             <#list columns as column >
+                <#if column.formShow && column.formType?? && column.formType!=''>
+                   <#assign filterColumns = filterColumns + [column]>
+                 </#if>
+            </#list>
+   </#if>
 const ${className}DetailPage = observer(() => {
   const history = useHistory();
 
@@ -42,12 +54,12 @@ const ${className}DetailPage = observer(() => {
   };
 
    const { value: store, loading } = useAsync(async () => {
-      const ${convertedStr}Store = new ${className}Store();
-      await ${convertedStr}Store.init(type);
+      const ${changeClassName}Store = new ${className}Store();
+      await ${changeClassName}Store.init(type);
       if (type !== ${className}OperationType.新增) {
-        await ${convertedStr}Store.getDetail(code, type);
+        await ${changeClassName}Store.getDetail(code);
       }
-      return ${convertedStr}Store;
+      return ${changeClassName}Store;
     }, [code]);
 
 
@@ -59,9 +71,6 @@ const ${className}DetailPage = observer(() => {
   const fields = _.map(store && toJS(store), (value, name) => ({ name, value }));
 
   const onValuesChange = (values) => {
-    if (values?.prizeList) {
-      return;
-    }
     runInAction(() => {
       _.assign(store, values);
     });
@@ -69,7 +78,7 @@ const ${className}DetailPage = observer(() => {
 
    return (
       !loading && (
-        <Page title={pageTitle} storeSelectorHidden>
+        <Page title={pageTitle[type]} storeSelectorHidden>
                  <ProForm
                       fields={fields}
                       onValuesChange={onValuesChange}
@@ -77,7 +86,7 @@ const ${className}DetailPage = observer(() => {
                       submitter={{
                         render: (props) => {
                           const actions = [
-                            <Button key="back" onClick={() =>   history.goBack();}>
+                            <Button key="back" onClick={() =>   history.goBack()}>
                               返回
                             </Button>,
                           ];
@@ -117,8 +126,13 @@ const ${className}DetailPage = observer(() => {
                       }}
                     >
                      <#if columns??>
-                          <#list columns as column>
-                              <#if column.formShow && column.formType?? && column.formType!=''>
+
+                          <#list filterColumns as column >
+
+                              <#if column?index % 3 == 0>
+                                 <Row>
+                               </#if>
+                                <Col span={8}>
                                     <#if column.formType = 'Input'>
                                         <ProFormText
                                            <#if column.istNotNull>
@@ -140,6 +154,16 @@ const ${className}DetailPage = observer(() => {
                                             name="${column.changeColumnName}"
                                             disabled={disabled}
                                          />
+                                    <#elseif column.formType = 'Date'>
+                                         <ProFormDatePicker
+                                              <#if column.istNotNull>
+                                              required
+                                              rules={[{ required: true }]}
+                                              </#if>
+                                              label="${column.remark}"
+                                              name="${column.changeColumnName}"
+                                              disabled={disabled}
+                                          />
                                     <#elseif column.formType = 'Textarea'>
                                          <ProFormTextArea
                                              <#if column.istNotNull>
@@ -149,6 +173,10 @@ const ${className}DetailPage = observer(() => {
                                              label="${column.remark}"
                                              name="${column.changeColumnName}"
                                              disabled={disabled}
+                                              fieldProps={{
+                                                 showCount: true,
+                                                 maxLength: 200,
+                                               }}
                                          />
                                     <#elseif column.formType = 'Select'>
                                          <ProFormSelect
@@ -162,9 +190,7 @@ const ${className}DetailPage = observer(() => {
                                                  </#if>
                                                </#if>
                                                  showSearch: true,
-                                                 filterOption: {(text, option) =>
-                                                    console.log(option);
-                                                 }
+
                                                  onClear: () => {
                                                    store.${column.changeColumnName} = undefined;
                                                  },
@@ -197,23 +223,18 @@ const ${className}DetailPage = observer(() => {
                                        />
                                     <#elseif column.formType = 'Image'>
                                         <ProForm.Item
-                                         <#if column.istNotNull>
-                                          required
-                                          rules={[{ required, message: '请上传${column.remark}' }]}
-                                            </#if>
+
                                           label="${column.remark}"
                                           name={'${column.changeColumnName}Code'}
                                         >
                                           <Attachment
-                                            appId="5019"
                                             attachmentType="Activity"
                                             disabled={disabled}
-                                            osstype="public"
-                                            otherCode={item.${convertedStr}Code}
+                                            otherCode={store.${uniColName}}
                                             count={1}
                                             maxFileSize={0.128}
                                             listType="picture-card"
-                                            // noGetData={!store.${convertedStr}Code}
+                                            // noGetData={store.${uniColName}}
                                             // deleteLocal
                                             accept="image/x-png,image/jpeg"
                                             onChangeMapping={(list) => {
@@ -226,11 +247,14 @@ const ${className}DetailPage = observer(() => {
                                               store.${column.changeColumnName}Code = undefined;
                                             }}
                                           />
-                                          <span style={{ color: '#999' }}>建议尺寸256*256p x；大小建议小于128k</span>
+                                          // <span style={{ color: '#999' }}>建议尺寸256*256p x；大小建议小于128k</span>
                                         </ProForm.Item>
                                     </#if>
+                                 </Col>
+                                 <#if (column?index + 1) % 3 == 0 || column?index == filterColumns?size - 1>
+                                     </Row>
+                                   </#if>
 
-                              </#if>
                           </#list>
                        </#if>
               </ProForm>

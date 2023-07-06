@@ -141,11 +141,25 @@ public class GeneratorServiceImpl extends ServiceImpl<ColumnInfoMapper, ColumnIn
     }
 
     @Override
+    public void generatorOMS(GenConfig genConfig, List<ColumnInfo> columns) {
+
+    }
+
+    @Override
     public ResponseEntity<Object> preview(GenConfig genConfig, List<ColumnInfo> columns) {
         if (genConfig.getId() == null) {
             throw new BadRequestException(CONFIG_MESSAGE);
         }
         List<Map<String, Object>> genList = GenUtil.preview(columns, genConfig);
+        return new ResponseEntity<>(genList, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> previewOMS(GenConfig genConfig, List<ColumnInfo> columns) {
+        if (genConfig.getId() == null) {
+            throw new BadRequestException(CONFIG_MESSAGE);
+        }
+        List<Map<String, Object>> genList = GenUtil.previewOMS(columns, genConfig);
         return new ResponseEntity<>(genList, HttpStatus.OK);
     }
 

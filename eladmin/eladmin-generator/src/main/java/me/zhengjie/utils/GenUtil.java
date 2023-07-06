@@ -45,6 +45,8 @@ public class GenUtil {
 
     public static final String PK = "PRI";
 
+    public static final String UNI = "UNI";
+
     public static final String EXTRA = "auto_increment";
 
     /**
@@ -64,6 +66,20 @@ public class GenUtil {
         return templateNames;
     }
 
+    private static List<String> getOMSTemplateName() {
+        List<String> templates = new ArrayList<>();
+        templates.add("oms-router");
+        templates.add("oms-service");
+
+        templates.add("oms-list");
+        templates.add("oms-column");
+
+        templates.add("oms-store");
+        templates.add("oms-detail");
+        templates.add("oms-modal");
+        return templates;
+    }
+
     /**
      * 获取前端代码模板名称
      *
@@ -73,8 +89,30 @@ public class GenUtil {
         List<String> templateNames = new ArrayList<>();
         templateNames.add("index");
         templateNames.add("api");
+
         return templateNames;
     }
+
+    public static List<Map<String, Object>> previewOMS(List<ColumnInfo> columns, GenConfig genConfig) {
+        Map<String, Object> genMap = getGenMap(columns, genConfig);
+        List<Map<String, Object>> genList = new ArrayList<>();
+        // 获取后端模版
+        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
+
+        // 获取前端模版
+        List<String> templates = getOMSTemplateName();
+
+        for (String templateName : templates) {
+            Map<String, Object> map = new HashMap<>(1);
+            Template template = engine.getTemplate("front/" + templateName + ".ftl");
+            map.put(templateName, template.render(genMap));
+            map.put("content", template.render(genMap));
+            map.put("name", templateName);
+            genList.add(map);
+        }
+        return genList;
+    }
+
 
     public static List<Map<String, Object>> preview(List<ColumnInfo> columns, GenConfig genConfig) {
         Map<String, Object> genMap = getGenMap(columns, genConfig);
@@ -91,6 +129,8 @@ public class GenUtil {
         }
         // 获取前端模版
         templates = getFrontTemplateNames();
+
+
         for (String templateName : templates) {
             Map<String, Object> map = new HashMap<>(1);
             Template template = engine.getTemplate("front/" + templateName + ".ftl");
@@ -197,6 +237,7 @@ public class GenUtil {
         genMap.put("date", LocalDate.now().toString());
         // 表名
         genMap.put("tableName", genConfig.getTableName());
+        genMap.put("prefix", genConfig.getPrefix());
         // 大写开头的类名
         String className = StringUtils.toCapitalizeCamelCase(genConfig.getTableName());
         // 小写开头的类名
@@ -263,6 +304,9 @@ public class GenUtil {
                 genMap.put("pkCapitalColName", capitalColumnName);
                 // 存储主键字段名
                 genMap.put("pkIdName", column.getColumnName());
+            }
+            if (UNI.equals(column.getKeyType())) {
+                genMap.put("uniColName", changeColumnName);
             }
             // 是否存在 Timestamp 类型的字段
             if (TIMESTAMP.equals(colType)) {

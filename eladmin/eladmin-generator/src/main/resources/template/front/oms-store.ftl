@@ -1,14 +1,20 @@
+<#if author!='' >
+    <#assign className =  author>
+</#if>
+<#assign changeClassName =  className?uncap_first>
+
+
 import { deserialize, list, object, primitive, serializable, serialize } from '@/utils/serializr';
 import type { LabeledValue } from 'antd/lib/select';
 import _ from 'lodash';
 import { action, IObservableArray, observable, runInAction } from 'mobx';
 import moment from 'moment';
 import { Moment } from 'moment';
-import { Module as module } from '../../service';
+import { ${changeClassName}Module as module } from '../../service';
 import { Dictionary } from '@/utils/dictionary';
-<#assign str =  "${className}">
-<#assign firstChar = str[0]?lower_case>
-<#assign convertedStr = firstChar + str[1..]>
+<#assign className =  "${className}">
+<#assign author =  "${author}">
+
 
 <#assign dictList = []>
 
@@ -73,8 +79,8 @@ export class ${className}Store{
           }
 
               @action
-              async getDetail(${convertedStr}Code: string) {
-                const data = await module.${convertedStr}.get.get({ ${convertedStr}Code });
+              async getDetail(${uniColName}: string) {
+                const data = await module.${changeClassName}.get.get({ ${uniColName}});
 
                 runInAction(() => {
                   _.merge(this, data);
@@ -84,10 +90,10 @@ export class ${className}Store{
             @action
             async save() {
               const params = serialize(this);
-              if (params.${convertedStr}Code) {
-                await module.${convertedStr}.update.post(params);
+              if (params.${uniColName}) {
+                await module.${changeClassName}.update.post(params);
               } else {
-                await module.${convertedStr}.create.post(params);
+                await module.${changeClassName}.create.post(params);
               }
                return true;
             }

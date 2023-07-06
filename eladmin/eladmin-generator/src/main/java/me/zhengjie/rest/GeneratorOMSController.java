@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -38,9 +39,9 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/generator")
+@RequestMapping("/api/generatorOMS")
 @Api(tags = "系统：代码生成管理")
-public class GeneratorController {
+public class GeneratorOMSController {
 
     private final GeneratorService generatorService;
     private final GenConfigService genConfigService;
@@ -88,7 +89,7 @@ public class GeneratorController {
             case 0: generatorService.generator(genConfigService.find(tableName), generatorService.getColumns(tableName));
                     break;
             // 预览
-            case 1: return generatorService.preview(genConfigService.find(tableName), generatorService.getColumns(tableName));
+            case 1: return generatorService.previewOMS(genConfigService.find(tableName), generatorService.getColumns(tableName));
             // 打包
             case 2: generatorService.download(genConfigService.find(tableName), generatorService.getColumns(tableName), request, response);
                     break;

@@ -1,6 +1,11 @@
-<#assign str =  "${className}">
-<#assign firstChar = str[0]?lower_case>
-<#assign convertedStr = firstChar + str[1..]>
+<#assign className =  "${className}">
+<#assign author =  "${author}">
+
+<#if author!='' >
+    <#assign className =  author>
+</#if>
+<#assign changeClassName =  className?uncap_first>
+
 
 import { ListView } from '@/components/ListView';
 import { useQuery } from '@/utils/hooks';
@@ -9,7 +14,7 @@ import _ from 'lodash';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router';
-import { ${convertedStr}Module as module } from '../../service';
+import { ${changeClassName}Module as module } from '../../service';
 import { ${className}Column,${className}OperationType } from './list-column';
 import type { ActionType } from '@/components/ListView';
 import { showDialog } from '@/components/Dialog';
@@ -31,7 +36,7 @@ const ${className}ListPage = observer(() => {
       actionRef={actionRef}
       formRef={formRef}
         storeSelectorHidden
-        api={module.${convertedStr}.pageList}
+        api={module.${package}.pageList}
         apiTransform={{
           requestTransform: (v) => ({
             ..._.omit(v, 'current'),
@@ -40,14 +45,14 @@ const ${className}ListPage = observer(() => {
           }),
         }}
         modelSchema={${className}Column}
-        rowKey="${convertedStr}Code"
+        rowKey="${uniColName}"
         scroll={{ x: 'max-content' }}
         toolBarRender={(action) => [
             <Button
               key="create"
               type="primary"
               onClick={() => {
-               // history.push('/${convertedStr}/${convertedStr}/'+${className}OperationType.新增);
+               // history.push('/${package}/${moduleName}/'+${className}OperationType.新增);
                 const result = await showDialog(Add${className}Modal, {
                     operateType:${className}OperationType.新增,
                   });

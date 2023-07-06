@@ -67,6 +67,7 @@ public interface GeneratorService extends IService<ColumnInfo> {
      */
     void generator(GenConfig genConfig, List<ColumnInfo> columns);
 
+    void generatorOMS(GenConfig genConfig, List<ColumnInfo> columns);
     /**
      * 预览
      * @param genConfig 配置信息
@@ -75,6 +76,7 @@ public interface GeneratorService extends IService<ColumnInfo> {
      */
     ResponseEntity<Object> preview(GenConfig genConfig, List<ColumnInfo> columns);
 
+    ResponseEntity<Object> previewOMS(GenConfig genConfig, List<ColumnInfo> columns);
     /**
      * 打包下载
      * @param genConfig 配置信息
