@@ -14,7 +14,7 @@ export default {
   components: { Java },
   data() {
     return {
-      data: null, height: '', activeName: 'Entity'
+      data: null, height: '', activeName: 'oms-router'
     }
   },
   created() {
