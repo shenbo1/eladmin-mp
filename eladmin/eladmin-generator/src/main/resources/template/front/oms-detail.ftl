@@ -2,8 +2,21 @@
     <#assign className =  author>
 </#if>
 <#assign changeClassName =  className?uncap_first>
+<#assign dictList = []>
 
+ <#if columns??>
+      <#list columns as column>
+        <#if (column.dictName)?? && (column.dictName)!=""  && (column.queryType)??  && column.queryType = 'enum' && (column.formType = 'Select' || column.formType = 'Radio') >
+         <#assign dictList = dictList + [column.dictName]>
+     </#if>
+</#list>
+ </#if>
+ <#assign result = ''>
+   <#list dictList as dict>
+    <#assign result = result+','+dict>
+   </#list>
 
+import { getEnumOptions } from '@/components/AntdPlus/util';
 import Attachment from '@/components/Common/Attachment';
 import StoreSelectOption from '@/components/Common/StoreSelectOption';
 import FooterToolbar from '@/components/FooterToolbar';
@@ -28,9 +41,9 @@ import moment from 'moment';
 import React from 'react';
 import { useHistory, useParams } from 'react-router';
 import { useAsync } from 'react-use';
-import {  ${className}Store } from '../../stores/${moduleName}/${moduleName}-store';
+import {  ${className}Store } from '../../stores/${moduleName}/detail-store';
 
-import { ${className}Column,${className}OperationType } from './list-column';
+import { ${className}Column,${className}OperationType${result} } from './list-column';
 
 
  <#assign filterColumns = []>
@@ -55,7 +68,7 @@ const ${className}DetailPage = observer(() => {
 
    const { value: store, loading } = useAsync(async () => {
       const ${changeClassName}Store = new ${className}Store();
-      await ${changeClassName}Store.init(type);
+      await ${changeClassName}Store.init();
       if (type !== ${className}OperationType.新增) {
         await ${changeClassName}Store.getDetail(code);
       }
@@ -183,14 +196,13 @@ const ${className}DetailPage = observer(() => {
                                               fieldProps={{
                                                <#if (column.dictName)?? && (column.dictName)!="">
                                                    <#--  如果是等于 直接取store,不然就是枚举 -->
-                                                 <#if column.queryType = '='>
-                                                 options:  store?.${column.dictName}Options.slice(),
-                                                <#else>
+                                                 <#if column.queryType = 'enum'>
                                                  options: getEnumOptions(${column.dictName}),
+                                                <#else>
+                                                 options: store?.${column.dictName}Options.slice(),
                                                  </#if>
                                                </#if>
                                                  showSearch: true,
-
                                                  onClear: () => {
                                                    store.${column.changeColumnName} = undefined;
                                                  },
@@ -207,10 +219,10 @@ const ${className}DetailPage = observer(() => {
                                          <ProFormRadio.Group
                                          <#if (column.dictName)?? && (column.dictName)!="">
                                             <#--  如果是等于 直接取store,不然就是枚举 -->
-                                          <#if column.queryType = '='>
-                                          options =  store?.${column.dictName}Options.slice()
+                                          <#if column.queryType = 'enum'>
+                                          options =   getEnumOptions(${column.dictName})
                                          <#else>
-                                          options = getEnumOptions(${column.dictName})
+                                          options = store?.${column.dictName}Options.slice()
                                           </#if>
                                         </#if>
                                           <#if column.istNotNull>
@@ -241,13 +253,13 @@ const ${className}DetailPage = observer(() => {
                                               if (!store) {
                                                 return;
                                               }
-                                              store.${column.changeColumnName}Code = list[0]?.fileCode;
+                                              store.${column.changeColumnName} = list[0]?.fileCode;
                                             }}
                                             onRemove={() => {
-                                              store.${column.changeColumnName}Code = undefined;
+                                              store.${column.changeColumnName} = undefined;
                                             }}
                                           />
-                                          // <span style={{ color: '#999' }}>建议尺寸256*256p x；大小建议小于128k</span>
+                                        {/*  <span style={{ color: '#999' }}>建议尺寸256*256p x；大小建议小于128k</span>*/}
                                         </ProForm.Item>
                                     </#if>
                                  </Col>

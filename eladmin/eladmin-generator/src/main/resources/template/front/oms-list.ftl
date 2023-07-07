@@ -19,6 +19,7 @@ import { ${className}Column,${className}OperationType } from './list-column';
 import type { ActionType } from '@/components/ListView';
 import { showDialog } from '@/components/Dialog';
 import type { ProFormInstance } from '@ant-design/pro-form';
+import {  ${className}Store } from '../../stores/${moduleName}/detail-store';
 
 // list.tsx
 const ${className}ListPage = observer(() => {
@@ -26,7 +27,7 @@ const ${className}ListPage = observer(() => {
   const location = useLocation();
   const [query, setQuery] = useQuery();
   const history = useHistory();
- const store = new ${className}Store();
+  const store = new ${className}Store();
   const actionRef = React.createRef<ActionType>();
  const formRef = React.createRef<ProFormInstance>();
 
@@ -36,7 +37,7 @@ const ${className}ListPage = observer(() => {
       actionRef={actionRef}
       formRef={formRef}
         storeSelectorHidden
-        api={module.${package}.pageList}
+        api={module.${changeClassName}.pageList}
         apiTransform={{
           requestTransform: (v) => ({
             ..._.omit(v, 'current'),
@@ -52,14 +53,14 @@ const ${className}ListPage = observer(() => {
               key="create"
               type="primary"
               onClick={() => {
-               // history.push('/${package}/${moduleName}/'+${className}OperationType.新增);
-                const result = await showDialog(Add${className}Modal, {
-                    operateType:${className}OperationType.新增,
-                  });
-                  if (result) {
-                    message.success('新增成功');
-                    actionRef?.current.reload();
-                  }
+               history.push('/${package}/${moduleName}/'+${className}OperationType.新增);
+                // const result = await showDialog(Add${className}Modal, {
+                  //   operateType:${className}OperationType.新增,
+                 //  });
+                 //  if (result) {
+                  //   message.success('新增成功');
+                  //   actionRef?.current.reload();
+                 //  }
               }}
             >
               新增

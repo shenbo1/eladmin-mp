@@ -142,7 +142,15 @@ public class GeneratorServiceImpl extends ServiceImpl<ColumnInfoMapper, ColumnIn
 
     @Override
     public void generatorOMS(GenConfig genConfig, List<ColumnInfo> columns) {
-
+        if (genConfig.getId() == null) {
+            throw new BadRequestException(CONFIG_MESSAGE);
+        }
+        try {
+            GenUtil.generatorCodeOMS(columns, genConfig);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new BadRequestException("生成失败，请手动处理已生成的文件");
+        }
     }
 
     @Override

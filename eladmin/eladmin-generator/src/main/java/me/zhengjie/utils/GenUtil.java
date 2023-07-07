@@ -221,6 +221,27 @@ public class GenUtil {
         }
     }
 
+    public static void generatorCodeOMS(List<ColumnInfo> columnInfos, GenConfig genConfig) throws IOException {
+        Map<String, Object> genMap = getGenMap(columnInfos, genConfig);
+        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
+        List<String> templates = getOMSTemplateName();
+
+        for (String templateName : templates) {
+            Template template = engine.getTemplate("front/" + templateName + ".ftl");
+            String filePath = getOMSFrontFilePath(templateName, genConfig.getPath(), genConfig.getPack(), genConfig.getModuleName(), genMap.get("changeClassName").toString());
+            String dd = "";
+            assert filePath != null;
+            File file = new File(filePath);
+
+            // 如果非覆盖生成
+            if (!genConfig.getCover() && FileUtil.exist(file)) {
+                continue;
+            }
+            // 生成代码
+            genFile(file, template, genMap);
+        }
+    }
+
     // 获取模版数据
     private static Map<String, Object> getGenMap(List<ColumnInfo> columnInfos, GenConfig genConfig) {
         // 存储模版字段数据
@@ -440,6 +461,48 @@ public class GenUtil {
         if ("index".equals(templateName)) {
             return path + File.separator + "index.vue";
         }
+
+        return null;
+    }
+
+    private static String getOMSFrontFilePath(String templateName, String apiPath, String pack,String moduleName, String apiName) {
+        // ticket/pages/clean-order/list-column.tsx
+        // ticket/pages/clean-order/list.tsx
+        // ticket/pages/clean-order/detail.tsx
+        // ticket/stores/clean-order/detail-store.ts
+        //ticket/route.config.ts
+        //ticket/service.ts
+        apiPath = apiPath+ File.separator +  pack;//
+        String pagePath = apiPath+"/pages/"+moduleName;
+
+        String storePath = apiPath+"/stores/"+moduleName;
+
+        String componentPath = apiPath+"/components/"+moduleName;
+
+        if ("oms-router".equals(templateName)) {
+            return apiPath + File.separator + "route.config.ts";
+        }
+
+        if ("oms-service".equals(templateName)) {
+            return apiPath + File.separator + "service.ts";
+        }
+
+        if ("oms-list".equals(templateName)) {
+            return pagePath + File.separator + "list.tsx";
+        }
+
+        if ("oms-column".equals(templateName)) {
+            return pagePath + File.separator + "list-column.tsx";
+        }
+        if ("oms-detail".equals(templateName)) {
+            return pagePath + File.separator + "detail.tsx";
+        }
+
+        if ("oms-store".equals(templateName)) {
+            return storePath + File.separator + "detail-store.ts";
+        }
+
+
 
         return null;
     }

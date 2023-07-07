@@ -34,7 +34,13 @@
           </div>
           <el-form size="small" label-width="90px">
             <el-table v-loading="loading" :data="data" :max-height="tableHeight" size="small" style="width: 100%;margin-bottom: 15px">
-              <el-table-column prop="columnName" width="110px" label="字段名称" />
+              <el-table-column prop="columnName" label="字段名称">
+                <template slot-scope="scope">
+                  <el-input v-model="data[scope.$index].columnName" size="mini" class="edit-input" />
+                </template>
+              </el-table-column>
+
+              <!-- <el-table-column prop="columnName" width="110px" label="字段名称" /> -->
               <el-table-column prop="columnType" width="110px" label="字段类型" />
               <el-table-column prop="remark" label="字段描述">
                 <template slot-scope="scope">
@@ -98,24 +104,12 @@
                       value="="
                     />
                     <el-option
-                      label="!="
-                      value="!="
+                      label="枚举"
+                      value="enum"
                     />
                     <el-option
-                      label=">="
-                      value=">="
-                    />
-                    <el-option
-                      label="<="
-                      value="<="
-                    />
-                    <el-option
-                      label="Like"
-                      value="Like"
-                    />
-                    <el-option
-                      label="NotNull"
-                      value="NotNull"
+                      label="字典"
+                      value="dict"
                     />
                     <el-option
                       label="BetWeen"

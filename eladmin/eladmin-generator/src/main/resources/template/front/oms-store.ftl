@@ -42,11 +42,13 @@ export class ${className}Store{
          @observable
         ${column.changeColumnName}:${result}
 
-        <#if (column.dictName)?? && (column.dictName)!=""  && (column.queryType)??  && column.queryType = '='>
+        <#if (column.dictName)?? && (column.dictName)!=""  && (column.queryType)??  && column.queryType != 'enum'>
         @observable
         ${column.dictName}Options : IObservableArray<LabeledValue> = observable.array([]);
-        <#assign newItem = "${column.dictName}">
-        <#assign dictList = dictList + [newItem]>
+          <#if (column.queryType='dict') >
+                <#assign newItem = "${column.dictName}">
+                <#assign dictList = dictList + [newItem]>
+         </#if>
         </#if>
      </#if>
       </#list>

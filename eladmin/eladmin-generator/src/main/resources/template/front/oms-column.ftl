@@ -20,8 +20,8 @@ import { getEnumName } from '@/utils';
 import { Inject } from '@/utils/mobx-provider';
 import _ from 'lodash';
 import { toJS } from 'mobx';
-import {  ${className}Store } from '../../stores/${moduleName}/${moduleName}-store';
-
+import {  ${className}Store } from '../../stores/${moduleName}/detail-store';
+import { Link } from 'react-router-dom';
 
 
 export enum ${className}OperationType {
@@ -47,7 +47,7 @@ export enum ${className}OperationType {
 
  <#if columns??>
       <#list columns as column>
-        <#if (column.dictName)?? && (column.dictName)!=""  && (column.queryType)??  && column.queryType != '=' && (column.formType = 'Select' || column.formType = 'Radio') >
+        <#if (column.dictName)?? && (column.dictName)!=""  && (column.queryType)??  && column.queryType = 'enum' && (column.formType = 'Select' || column.formType = 'Radio') >
 export enum ${column.dictName}{
 
 }
@@ -118,7 +118,7 @@ export class ${className}Column{
             <#--  列表字段 不配置 -->
             <#if !column.columnShow>hideInTable: true,</#if>
             <#--  表单类型 查询方式 和关联字典 -->
-           <#if column.queryType?? && column.formType?? && column.formType = 'Select' &&  (column.dictName)?? && (column.dictName)!="" >
+           <#if column.queryType?? && column.formType?? && column.formType = 'Select'  && column.queryType='dict' &&  (column.dictName)?? && (column.dictName)!="" >
             valueType: 'select',
             valueDictionary: '${column.dictName}',
             </#if>
@@ -145,7 +145,7 @@ export class ${className}Column{
          </#if>
 
         <#--  如果是Select 并且 配置了字典，自动生成一个查询 -->
-        <#if column.queryType?? && column.formType?? && column.formType = 'Select' &&  (column.dictName)?? && (column.dictName)!="" >
+        <#if column.queryType?? && column.formType?? && column.formType = 'Select'  && column.queryType='dict'  &&  (column.dictName)?? && (column.dictName)!="" >
         @column({
             title: '${column.remark}',
          })

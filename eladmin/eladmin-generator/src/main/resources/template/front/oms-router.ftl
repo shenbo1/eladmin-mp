@@ -1,4 +1,4 @@
--- route.config.ts
+// route.config.ts
 import type { IRoute } from '@/types/route';
 
 

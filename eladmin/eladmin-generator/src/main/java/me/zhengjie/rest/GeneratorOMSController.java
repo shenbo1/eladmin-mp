@@ -86,7 +86,7 @@ public class GeneratorOMSController {
         }
         switch (type){
             // 生成代码
-            case 0: generatorService.generator(genConfigService.find(tableName), generatorService.getColumns(tableName));
+            case 0: generatorService.generatorOMS(genConfigService.find(tableName), generatorService.getColumns(tableName));
                     break;
             // 预览
             case 1: return generatorService.previewOMS(genConfigService.find(tableName), generatorService.getColumns(tableName));
